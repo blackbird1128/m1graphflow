@@ -38,6 +38,31 @@ public class Edge implements Comparable<Edge> {
         to =  new Node(idTo);
     }
 
+    public Edge(String fromLabel, String toLabel) {
+        this.from = new Node(fromLabel);
+        this.to = new Node(toLabel);
+    }
+
+    public Edge(Node from, String toLabel) {
+        this.from = from;
+        this.to = new Node(toLabel);
+    }
+
+    public Edge(String fromLabel, Node to) {
+        this.from = new Node(fromLabel);
+        this.to = to;
+    }
+
+    public Edge(int idFrom, String toLabel) {
+        this.from = new Node(idFrom);
+        this.to = new Node(toLabel);
+    }
+
+    public Edge(String fromLabel, int idTo) {
+        this.from = new Node(fromLabel);
+        this.to = new Node(idTo);
+    }
+
 
     public Node from()
     {

@@ -106,6 +106,25 @@ public class Graf {
     }
 
     /**
+     *
+     * Add a Node to the graph
+     * if the Node is already in the graph, it will not be added
+     * or replaced
+     *
+     * @param nodeId The id of th node to add
+     * @return true if the node was added, false otherwise
+     */
+    public boolean addNode(int nodeId, String name)
+    {
+        if(graphNodes.contains(nodeId))
+        {
+            return false;
+        }
+        graphNodes.add(new Node(nodeId,name));
+        return true;
+    }
+
+    /**
      * Add a Node to the graph based on its node id
      * if the Node is already in the graph, it will not be added
      * or replaced
@@ -872,7 +891,7 @@ public class Graf {
             if (edges != null) {
                 Collections.sort(edges);
                 for (Edge e : edges) {
-                    repr.append(String.format("\t%d -> %d", e.from().getId(), e.to().getId()));
+                    repr.append(String.format("\t%s -> %s", e.from(), e.to()));
                     if (e.isWeighted()) {
                         repr.append(String.format(" [label=%d, len=%d]", e.getWeight(), e.getWeight()));
                     }
@@ -884,7 +903,7 @@ public class Graf {
             {
                 if(getIncidentEdges(n).size() == 0)
                 {
-                    repr.append("\t" +n.getId() + "\n");
+                    repr.append("\t" +n + "\n");
                 }
             }
         }
@@ -1237,5 +1256,10 @@ public class Graf {
     }
 
 
-
+    public void addEdge(int idFrom, String t) {
+        addEdge(new Edge(idFrom,t));
+    }
+    public void addEdge(String from, int idTo) {
+        addEdge(new Edge(from,idTo));
+    }
 }

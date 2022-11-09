@@ -8,29 +8,45 @@ public class Node implements Comparable<Node> {
 
     String name;
     int id;
+    static int max_id = -1;
 
 
     public Node(int _id)
     {
-
+        if (_id>max_id){
+            max_id = _id;
+        }
         id = _id;
-        name = "default";
+        name = null;
 
     }
 
     public Node(int _id , String _name)
     {
+        if (_id>max_id){
+            max_id = _id;
+        }
         id = _id;
         name = _name;
+    }
 
+    public Node(String _name){
+        id = ++max_id;
+        name = _name;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+        if (o.getClass().getSimpleName().equals("int") || o.getClass().getSimpleName().equals("Integer")){
+            return this.id== (Integer) o;
+        }
+        if (o.getClass().getSimpleName().equals("String")){
+            return name.equals((String) o);
+        }
         if (o == null || getClass() != o.getClass()) return false;
         Node node = (Node) o;
-        return id == node.id;
+        return ((name!=null && node.name!=null) ? name.equals(node.name) : false) || id == node.id;
     }
 
     @Override
@@ -40,7 +56,7 @@ public class Node implements Comparable<Node> {
 
     @Override
     public String toString() {
-        return "" + id;
+        return name!=null ? name : ""+id;
     }
 
     public String getName() {
