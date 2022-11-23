@@ -8,10 +8,58 @@ import m1graph2022.*;
 
 public class Main {
 
+
+    static Graf g0;
+    static Graf g1;
+    static Graf g2;
+
+    static void init(){
+        Node s = new Node("s");
+        Node t = new Node("t");
+
+
+        Node n1 = new Node();
+        Node n2 = new Node();
+        Node n3 = new Node();
+
+        g0 = new Graf();
+        g0.addNode(s);
+        g0.addNode(n1);
+        g0.addNode(t);
+
+        g0.addEdge(s,n1,2);
+        g0.addEdge(n1,t,2);
+
+        g1 = new Graf();
+        g1.addNode(s);
+        g1.addNode(n1);
+        g1.addNode(n2);
+        g1.addNode(t);
+
+        g1.addEdge(s,n1,2);
+        g1.addEdge(n1,n2,3);
+        g1.addEdge(n2,t,2);
+
+        g2 = new Graf();
+        g2.addNode(s);
+        g2.addNode(n1);
+        g2.addNode(n2);
+        g2.addNode(n3);
+        g2.addNode(t);
+
+        g2.addEdge(s,n1,2);
+        g2.addEdge(s,n3,5);
+        g2.addEdge(n3,t,6);
+        g2.addEdge(n1,n2,3);
+        g2.addEdge(n2,t,2);
+    }
+
     static private void println(Object...o) {
         for (int i = 0; i < o.length; i++) {
             System.out.println(o[i]);
         }
+        if(o.length==0)
+            System.out.println();
     }
 
     private static void print(Object... o) {
@@ -21,23 +69,10 @@ public class Main {
     }
 
     public static void main(String[] args)  {
-        Graf g = new Graf();
-        g.addNode(0,"s");
-        g.addNode(1,"t");
-        g.addNode(2);
-        g.addNode(3);
-        g.addNode(4);
-        g.addNode(5);
-
-        g.addEdge(new Edge("s","t"));
-        g.addEdge(new Edge("s",2));
-        g.addEdge(new Edge(2,"t"));
-        g.addEdge(2,3);
-        g.addEdge(3,4);
-        g.addEdge(4,5);
-        g.addEdge(5,"t");
-
-        print(g.toDotString());
+        init();
+        println(g0.toDotString());
+        println(g1.toDotString());
+        println(g2.toDotString());
     }
 
 }

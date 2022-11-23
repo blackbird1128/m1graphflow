@@ -35,6 +35,10 @@ public class Node implements Comparable<Node> {
         name = _name;
     }
 
+    public Node(){
+        id = ++max_id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
