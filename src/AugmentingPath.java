@@ -1,28 +1,20 @@
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.IntArrayData;
 import m1graph2022.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-
-enum AP_ALGORITHM
-{
-    DFS,
-
-}
 
 public class AugmentingPath {
 
 
     public static void main(String[] args)  {
-            Graf g = Graf.fromDotFile("dots/simpleGraph");
+            Graf g = Graf.fromDotFile("dots/weightedSimpleGraph");
             System.out.println(g.toDotString());
             System.out.println( AugmentingPath.getAugmentingPath(g.getNode(1), g.getNode(5), g,  AP_ALGORITHM.DFS));
     }
 
 
-    static Pair<List<Node>,Integer> getAugmentingPath(Node start, Node end, Graf g, AP_ALGORITHM algorithm )
+    public static Pair<List<Edge>,Integer> getAugmentingPath(Node start, Node end, Graf g, AP_ALGORITHM algorithm )
     {
         switch (algorithm)
         {
@@ -33,7 +25,7 @@ public class AugmentingPath {
         }
     }
 
-    static Pair<List<Node>,Integer> getAugmentingPath(int idStart, int idEnd, Graf g , AP_ALGORITHM algorithm)
+    public static Pair<List<Edge>,Integer> getAugmentingPath(int idStart, int idEnd, Graf g , AP_ALGORITHM algorithm)
     {
         Node start = new Node(idStart);
         Node end = new Node(idEnd);
@@ -42,23 +34,26 @@ public class AugmentingPath {
 
 
 
-    private static Pair<List<Node>,Integer> getPathToRec(Node start, Node end, Graf g, List<Node> currentPath, Set<Node> visited, int currentFlow)
+    private static Pair<List<Edge>,Integer> getPathToRec(Node start, Node end, Graf g, List<Edge> currentPath, Set<Node> visited, int currentFlow)
     {
         if(start.equals(end))
         {
-            currentPath.add(end);
-            return new Pair<List<Node>,Integer>(currentPath,currentFlow);
+            return new Pair<List<Edge>,Integer>(currentPath,currentFlow);
         }
         else
         {
-            //currentPath.add(start);
             visited.add(start);
             for(Node n : g.getSuccessors(start))
             {
                 if(!visited.contains(n))
                 {
-                    ArrayList<Node> extendedPath =  new ArrayList<>(currentPath); // copy cause reference are fucking weird
-                    extendedPath.add(n);
+                    ArrayList<Edge> extendedPath =  new ArrayList<>(currentPath); // copy cause reference are fucking weird
+                    List<Edge> le = g.getEdges(start,n);
+                    Edge e = Collections.max(le); // we take the greatest augmenting path
+                    extendedPath.add(e);
+                    if(e.getWeight() < currentFlow){
+                        currentFlow = e.getWeight();
+                    }
                     return getPathToRec(n, end, g , extendedPath,visited, currentFlow);
                 }
 
@@ -68,7 +63,7 @@ public class AugmentingPath {
 
     }
 
-    private static Pair<List<Node>,Integer> getAugmentingPathDFS(Node start, Node end , Graf g)
+    private static Pair<List<Edge>,Integer> getAugmentingPathDFS(Node start, Node end , Graf g)
     {
         List<Node> startReachable =  g.getReachable(start);
         if(! startReachable.contains(end))
@@ -78,7 +73,8 @@ public class AugmentingPath {
         else
         {
             HashSet<Node> visited = new HashSet<>();
-            return getPathToRec(start, end, g, new ArrayList<>(),visited, 0);
+            ArrayList<Edge> currentPath = new ArrayList<>();
+            return getPathToRec(start, end, g,currentPath,visited, Integer.MAX_VALUE);
         }
 
 

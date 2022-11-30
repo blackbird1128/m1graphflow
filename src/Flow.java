@@ -5,27 +5,27 @@ import java.util.HashMap;
 public class Flow {
 
 
-    HashMap<NodePair, Integer> internalRepresentation;
+    HashMap<Pair<Node,Node>, Integer> internalRepresentation;
 
     Flow()
     {
         internalRepresentation = new HashMap<>();
     }
 
-    void addToFlow(NodePair n, int flow)
+    void addToFlow(Pair<Node,Node> n, int flow)
     {
         internalRepresentation.put(n, flow);
     }
 
     void addToFlow(Node first, Node second, int flow)
     {
-        NodePair n = new NodePair(first, second);
+        Pair<Node,Node> n = new Pair<>(first, second);
         internalRepresentation.put(n, flow);
     }
 
     void addToFlow(int firstId, int secondId, int flow)
     {
-        NodePair n = new NodePair(firstId, secondId);
+        Pair<Node,Node> n = new Pair<>(new Node(firstId),new Node(secondId));
         internalRepresentation.put(n, flow);
     }
 

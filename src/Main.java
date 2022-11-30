@@ -73,11 +73,14 @@ public class Main {
 
     public static void main(String[] args)  {
         init();
-        //println(g0.toDotString());
-        //println(g1.toDotString());
-        //println(g2.toDotString());
-        System.out.println(System.getProperty("user.dir"));
-        println(gSubject.toDotString());
+        Graf g = Graf.fromDotFile("dots/weightedSimpleGraph");
+        System.out.println(g.toDotString());
+        Pair<List<Edge>,Integer> pair = AugmentingPath.getAugmentingPath(g.getNode(1), g.getNode(5), g,  AP_ALGORITHM.DFS);
+        System.out.println(pair.first);
+
+        println(MaximalFlow.graphAndPathDotString(g,pair));
+        println(MaximalFlow.flowDotString(g, pair));
+        println(MaximalFlow.grafToResidual(g,pair));
     }
 
 }

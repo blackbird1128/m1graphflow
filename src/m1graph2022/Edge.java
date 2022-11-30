@@ -3,15 +3,6 @@ package m1graph2022;
 import java.util.HashSet;
 import java.util.Objects;
 
-/*
-
-
-
-
- */
-
-
-
 public class Edge implements Comparable<Edge> {
 
     Node from;
@@ -117,7 +108,7 @@ public class Edge implements Comparable<Edge> {
         return Objects.hash(from.id, to.id, weight);
     }
 
-    boolean isWeighted()
+    public boolean isWeighted()
     {
         return ! (weight == null);
     }
@@ -125,6 +116,10 @@ public class Edge implements Comparable<Edge> {
     public Integer getWeight()
     {
         return weight;
+    }
+
+    public void setWeight(Integer newWeight ){
+        weight = newWeight;
     }
 
     @Override

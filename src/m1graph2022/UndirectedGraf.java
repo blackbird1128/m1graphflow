@@ -97,7 +97,7 @@ public class UndirectedGraf extends Graf{
      * @return Graf A copy of the undirected graph
      */
     @Override
-    protected UndirectedGraf copy()
+    public UndirectedGraf copy()
     {
         UndirectedGraf copy = new UndirectedGraf();
         for(Node n : graphNodes)

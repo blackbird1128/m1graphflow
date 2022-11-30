@@ -6,7 +6,7 @@ import java.util.Set;
 
 public class Node implements Comparable<Node> {
 
-    String name;
+    String name = null;
     int id;
     static int max_id = -1;
 
@@ -50,12 +50,15 @@ public class Node implements Comparable<Node> {
         }
         if (o == null || getClass() != o.getClass()) return false;
         Node node = (Node) o;
-        return ((name!=null && node.name!=null) ? name.equals(node.name) : false) || id == node.id;
+        return (name != null && node.name != null && name.equals(node.name)) || id == node.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, id);
+        if(name!=null){
+            return Objects.hash(name);
+        }
+        return Objects.hash(null, id);
     }
 
     @Override
@@ -65,10 +68,6 @@ public class Node implements Comparable<Node> {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override

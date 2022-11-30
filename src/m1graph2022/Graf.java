@@ -57,7 +57,7 @@ public class Graf {
      * Return a copy of the graph
      * @return Graf A copy of the graph
      */
-    protected Graf copy()
+    public Graf copy()
     {
         Graf copy = new Graf();
         for(Node n : graphNodes)
@@ -186,6 +186,20 @@ public class Graf {
         {
             for ( Node n : graphNodes ) {
                 if(n.getId() == id )
+                {
+                    return n;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Node getNode(String s) {
+        Node nodeToGet = new Node(s);
+        if(existsNode(nodeToGet))
+        {
+            for ( Node n : graphNodes ) {
+                if(n.equals(nodeToGet))
                 {
                     return n;
                 }
@@ -675,6 +689,12 @@ public class Graf {
         return null;
     }
 
+    public List<Edge> getEdges(Node from, Node to){
+        List<Edge> l = new ArrayList(adjEdList.get(from));
+        l.retainAll(getInEdges(to));
+        return l;
+    }
+
     /**
      * Get the out edges of the Node n
      * @param n the Node to get the out edges of
@@ -925,6 +945,10 @@ public class Graf {
         return repr.toString();
     }
 
+    public String toString(){
+        return toDotString();
+    }
+
     /**
      * Write the string representing the graph in the dot format into a file
      * the filename is made of the param filename and the extension ".gv"
@@ -1037,7 +1061,7 @@ public class Graf {
 
                         Integer weight = null;
                         possibleWeight = possibleWeight.trim();
-                        Pattern weightPattern = Pattern.compile("\\[(?:\\s*label\\s*=\\s*\\\".*\\\"\\s*,?|\\s*len\\s*=\\s*(\\d+)\\s*,?)*\\].*");
+                        Pattern weightPattern = Pattern.compile("\\[(?:\\s*label\\s*=\\s*\\\"?.*?\\\"?\\s*,?|\\s*len\\s*=\\s*(\\d+)\\s*,?)*\\].*");
                         Matcher weightMatcher = weightPattern.matcher(possibleWeight);
                         if(weightMatcher.matches())
                         {
