@@ -661,6 +661,16 @@ public class Graf {
         return successorsSet;
     }
 
+
+    public Edge getEdge(Node from, Node to )
+    {
+        if(existsEdge(from, to ))
+        {
+            return adjEdList.get(from).get(adjEdList.get(from).indexOf(new Edge(from, to)));
+        }
+        return null;
+    }
+
     /**
      * Get the out edges of the Node n
      * @param n the Node to get the out edges of
@@ -930,6 +940,8 @@ public class Graf {
         }
 
     }
+
+
 
     /**
      Write the string representing the graph in the dot format into a file
