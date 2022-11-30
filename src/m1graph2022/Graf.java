@@ -143,6 +143,10 @@ public class Graf {
         return true;
     }
 
+    public void addNode(String nodeStr) {
+        addNode(new Node(nodeStr));
+    }
+
     /**
      *
      * Check if a Node is contained in the graph,
@@ -978,7 +982,7 @@ public class Graf {
 
         String text = reader.lines().collect(Collectors.joining("\n"));
 
-        Pattern nodesGetter = Pattern.compile("(digraph)(?:[^\\{])*\\{((?:[^\\}])*)\\}");
+        Pattern nodesGetter = Pattern.compile("(digraph)(?:[^\\{])*\\{((?:[^\\}])*)\\}"); //wtf Alexandre, j'arrive pas à comprendre ta regex x)
         Matcher m = nodesGetter.matcher(text);
 
         if(m.groupCount() < 2)
@@ -992,7 +996,7 @@ public class Graf {
 
         String[] lines = nodesAndEdges.split("\\r?\\n");
 
-        Pattern lineSplitter = Pattern.compile("\\s*([0-9]+)\\s*(->)\\s*([0-9]+)(.*);*|([0-9]+);*");
+        Pattern lineSplitter = Pattern.compile("\\s*([0-9a-zA-Z]+)\\s*(->)\\s*([0-9a-zA-Z]+)(.*);*|([0-9a-zA-Z]+);*");
 
         for(String line: lines)
         {
@@ -1005,8 +1009,13 @@ public class Graf {
                     if(lineMatcher.group(1) == null) // No match for the second group, we are in the second situation of the regex
                     {
                         String nodeStr = lineMatcher.group(0);
-                        int nodeId = Integer.parseInt(nodeStr);
-                        g.addNode(nodeId);
+                        if(nodeStr.matches("[A-Za-z]+")){
+                            g.addNode(nodeStr);
+                        }else{
+                            int nodeId = Integer.parseInt(nodeStr);
+                            g.addNode(nodeId);
+                        }
+
                     }
                     else {
 
@@ -1014,11 +1023,9 @@ public class Graf {
                         String toS = lineMatcher.group(3);
                         String possibleWeight = lineMatcher.group(4);
 
-                        int from = Integer.parseInt(fromS);
-                        int to = Integer.parseInt(toS);
                         Integer weight = null;
                         possibleWeight = possibleWeight.trim();
-                        Pattern weightPattern = Pattern.compile("\\[\\s*(?:label|len)=(\\d+)\\s*,\\s*(?:label|len)=(\\d+)\\]");
+                        Pattern weightPattern = Pattern.compile("\\[(?:\\s*label\\s*=\\s*\\\".*\\\"\\s*,?|\\s*len\\s*=\\s*(\\d+)\\s*,?)*\\].*");
                         Matcher weightMatcher = weightPattern.matcher(possibleWeight);
                         if(weightMatcher.matches())
                         {
@@ -1026,11 +1033,41 @@ public class Graf {
                         }
                         if(weight != null)
                         {
-                            g.addEdge(from,to, weight);
+                            if(fromS.matches("[a-zA-Z]+")){
+                                if(toS.matches("[a-zA-Z]+")){
+                                    g.addEdge(fromS,toS, weight);
+                                }else{
+                                    int to = Integer.parseInt(toS);
+                                    g.addEdge(fromS,to, weight);
+                                }
+                            }else {
+                                int from = Integer.parseInt(fromS);
+                                if (toS.matches("[a-zA-Z]+")) {
+                                    g.addEdge(from, toS, weight);
+                                } else {
+                                    int to = Integer.parseInt(toS);
+                                    g.addEdge(from, to, weight);
+                                }
+                            }
                         }
                         else
                         {
-                            g.addEdge(from, to);
+                            if(fromS.matches("[a-zA-Z]+")){
+                                int to = Integer.parseInt(toS);
+                                if(toS.matches("[a-zA-Z]+")){
+                                    g.addEdge(fromS,toS);
+                                }else{
+                                    g.addEdge(fromS,to);
+                                }
+                            }else{
+                                int from = Integer.parseInt(fromS);
+                                if(toS.matches("[a-zA-Z]+")){
+                                    g.addEdge(from,toS);
+                                }else{
+                                    int to = Integer.parseInt(toS);
+                                    g.addEdge(from,to);
+                                }
+                            }
                         }
                     }
                 }
@@ -1040,7 +1077,6 @@ public class Graf {
 
         return g;
     }
-
 
 
     /**
@@ -1261,5 +1297,20 @@ public class Graf {
     }
     public void addEdge(String from, int idTo) {
         addEdge(new Edge(from,idTo));
+    }
+    public void addEdge(int from, String toS, Integer weight) {
+        addEdge(new Edge(new Node(from),new Node(toS),weight));
+    }
+
+    public void addEdge(String fromS, int to, Integer weight) {
+        addEdge(new Edge(new Node(fromS),new Node(to),weight));
+    }
+
+    public void addEdge(String fromS, String toS, Integer weight) {
+        addEdge(new Edge(new Node(fromS),new Node(toS),weight));
+    }
+
+    private void addEdge(String fromS, String toS) {
+        addEdge(new Edge(fromS,toS));
     }
 }

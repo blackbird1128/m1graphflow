@@ -22,7 +22,7 @@ public class AugmentingPath {
     }
 
 
-    static List<Node> getAugmentingPath(Node start, Node end, Graf g, AP_ALGORITHM algorithm )
+    static Pair<List<Node>,Integer> getAugmentingPath(Node start, Node end, Graf g, AP_ALGORITHM algorithm )
     {
         switch (algorithm)
         {
@@ -33,30 +33,21 @@ public class AugmentingPath {
         }
     }
 
-    static List<Node> getAugmentingPath(int idStart, int idEnd, Graf g , AP_ALGORITHM algorithm)
+    static Pair<List<Node>,Integer> getAugmentingPath(int idStart, int idEnd, Graf g , AP_ALGORITHM algorithm)
     {
         Node start = new Node(idStart);
         Node end = new Node(idEnd);
         return getAugmentingPath(start, end, g, algorithm);
     }
 
-    static int getMaximumFlow(List<Node> augmentingPath, Graf g)
-    {
-        for(int i = 0 ; i < augmentingPath.size() - 1; i++)
-        {
-
-        }
-        return -1;
-    }
 
 
-
-    private static List<Node> getPathToRec(Node start, Node end, Graf g, List<Node> currentPath, Set<Node> visited)
+    private static Pair<List<Node>,Integer> getPathToRec(Node start, Node end, Graf g, List<Node> currentPath, Set<Node> visited, int currentFlow)
     {
         if(start.equals(end))
         {
             currentPath.add(end);
-            return currentPath;
+            return new Pair<List<Node>,Integer>(currentPath,currentFlow);
         }
         else
         {
@@ -66,9 +57,9 @@ public class AugmentingPath {
             {
                 if(!visited.contains(n))
                 {
-                    ArrayList<Node> startingNode =  new ArrayList<>(currentPath); // copy cause reference are fucking weird
-                    startingNode.add(start);
-                    return getPathToRec(n, end, g , startingNode,visited);
+                    ArrayList<Node> extendedPath =  new ArrayList<>(currentPath); // copy cause reference are fucking weird
+                    extendedPath.add(n);
+                    return getPathToRec(n, end, g , extendedPath,visited, currentFlow);
                 }
 
             }
@@ -77,7 +68,7 @@ public class AugmentingPath {
 
     }
 
-    private static List<Node> getAugmentingPathDFS(Node start, Node end , Graf g)
+    private static Pair<List<Node>,Integer> getAugmentingPathDFS(Node start, Node end , Graf g)
     {
         List<Node> startReachable =  g.getReachable(start);
         if(! startReachable.contains(end))
@@ -87,7 +78,7 @@ public class AugmentingPath {
         else
         {
             HashSet<Node> visited = new HashSet<>();
-            return getPathToRec(start, end, g, new ArrayList<>(),visited);
+            return getPathToRec(start, end, g, new ArrayList<>(),visited, 0);
         }
 
 

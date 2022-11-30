@@ -12,6 +12,7 @@ public class Main {
     static Graf g0;
     static Graf g1;
     static Graf g2;
+    static Graf gSubject;
 
     static void init(){
         Node s = new Node("s");
@@ -52,6 +53,8 @@ public class Main {
         g2.addEdge(n3,t,6);
         g2.addEdge(n1,n2,3);
         g2.addEdge(n2,t,2);
+
+        gSubject =Graf.fromDotFile("src/SubjectGraf");
     }
 
     static private void println(Object...o) {
@@ -70,9 +73,11 @@ public class Main {
 
     public static void main(String[] args)  {
         init();
-        println(g0.toDotString());
-        println(g1.toDotString());
-        println(g2.toDotString());
+        //println(g0.toDotString());
+        //println(g1.toDotString());
+        //println(g2.toDotString());
+        System.out.println(System.getProperty("user.dir"));
+        println(gSubject.toDotString());
     }
 
 }
