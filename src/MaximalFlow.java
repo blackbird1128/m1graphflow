@@ -97,7 +97,7 @@ public class MaximalFlow {
                 }
                 else
                 {
-                    g.removeEdge(e);
+                    result.removeEdge(e);
                 }
                 result.addEdge(e.to(),e.from(),pathPair.second);
             }
@@ -105,12 +105,12 @@ public class MaximalFlow {
         return result;
     }
 
-    public Graf getMaxFlowGraf(Graf g){
-        Graf currentGraf = g;
-        Pair<List<Edge>, Integer> p = null;
+    public static Graf getMaxFlowGraf(Graf g){
+        Graf currentGraf = g.copy();
+        Pair<List<Edge>, Integer> p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,AP_ALGORITHM.DFS);
         do {
+            currentGraf = grafToResidual(currentGraf,p);
             p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,AP_ALGORITHM.DFS);
-
         }while (p!=null);
         return currentGraf;
     }

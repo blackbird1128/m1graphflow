@@ -9,9 +9,9 @@ public class Pair <T1, T2>{
 
     @Override
     public String toString() {
-        return "Pair{" +
-                "first=" + first +
-                ", second=" + second +
-                '}';
+        return "{\n" +
+                "\tfirst : " + first +
+                ",\n\tsecond : " + second +
+                "\n}";
     }
 }

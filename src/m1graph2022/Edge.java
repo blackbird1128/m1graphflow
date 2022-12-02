@@ -78,7 +78,7 @@ public class Edge implements Comparable<Edge> {
 
     protected boolean containsSameNodes(Edge other)
     {
-        HashSet<Integer> containedNodes = new HashSet<Integer>();
+        HashSet<Integer> containedNodes = new HashSet<>();
         containedNodes.add(from().getId());
         containedNodes.add(to().getId());
         return (containedNodes.contains(other.from().getId()) && containedNodes.contains(other.to().getId()));
@@ -87,7 +87,7 @@ public class Edge implements Comparable<Edge> {
 
     public String toString()
     {
-        String repr =  this.from().getId() + "->" + this.to().getId();
+        String repr =  this.from() + "->" + this.to();
         if(this.isWeighted())
         {
             repr += " weight=" + this.getWeight();

@@ -56,31 +56,15 @@ public class Main {
 
         gSubject =Graf.fromDotFile("src/SubjectGraf");
     }
-
-    static private void println(Object...o) {
-        for (int i = 0; i < o.length; i++) {
-            System.out.println(o[i]);
-        }
-        if(o.length==0)
-            System.out.println();
-    }
-
-    private static void print(Object... o) {
-        for (int i = 0; i < o.length; i++) {
-            System.out.print(o[i]);
-        }
-    }
-
+    
     public static void main(String[] args)  {
         init();
         Graf g = Graf.fromDotFile("dots/weightedSimpleGraph");
         System.out.println(g.toDotString());
-        Pair<List<Edge>,Integer> pair = AugmentingPath.getAugmentingPath(g.getNode(1), g.getNode(5), g,  AP_ALGORITHM.DFS);
-        System.out.println(pair.first);
-
-        println(MaximalFlow.graphAndPathDotString(g,pair));
-        println(MaximalFlow.flowDotString(g, pair));
-        println(MaximalFlow.grafToResidual(g,pair));
+        Pair<List<Edge>,Integer> pair = AugmentingPath.getAugmentingPath(g.getNode("s"), g.getNode("t"), g,  AP_ALGORITHM.DFS);
+        System.out.println(pair);
+        Graf maxFlow = MaximalFlow.getMaxFlowGraf(g);
+        System.out.println(maxFlow);
     }
 
 }
