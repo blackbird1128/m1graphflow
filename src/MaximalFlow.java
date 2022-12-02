@@ -99,7 +99,7 @@ public class MaximalFlow {
                 {
                     result.removeEdge(e);
                 }
-                result.addEdge(e.to(),e.from(),pathPair.second);
+                result.updateEdge(e.to(), e.from(),pathPair.second);
             }
         }
         return result;
@@ -109,6 +109,7 @@ public class MaximalFlow {
         Graf currentGraf = g.copy();
         Pair<List<Edge>, Integer> p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,AP_ALGORITHM.DFS);
         do {
+            System.out.println(graphAndPathDotString(currentGraf,p));
             currentGraf = grafToResidual(currentGraf,p);
             p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,AP_ALGORITHM.DFS);
         }while (p!=null);

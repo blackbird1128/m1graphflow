@@ -59,11 +59,10 @@ public class Main {
     
     public static void main(String[] args)  {
         init();
-        Graf g = Graf.fromDotFile("dots/weightedSimpleGraph");
-        System.out.println(g.toDotString());
-        Pair<List<Edge>,Integer> pair = AugmentingPath.getAugmentingPath(g.getNode("s"), g.getNode("t"), g,  AP_ALGORITHM.DFS);
-        System.out.println(pair);
-        Graf maxFlow = MaximalFlow.getMaxFlowGraf(g);
+        Graf maxFlow;
+        Graf g = gSubject;
+        System.out.println(g);
+        maxFlow = MaximalFlow.getMaxFlowGraf(g);
         System.out.println(maxFlow);
     }
 

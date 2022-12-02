@@ -266,9 +266,9 @@ public class Graf {
         Edge lookedEdge = new Edge(u, v);
         for(List<Edge> edges : adjEdList.values())
         {
-            if(edges.contains(lookedEdge))
-            {
-                return true;
+            for (Edge e :
+                    edges) {
+                if (e.from.equals(u) && e.to.equals(v)) return true;
             }
         }
         return false;
@@ -418,6 +418,37 @@ public class Graf {
         Node to = new Node(toId);
         Edge toAdd = new Edge(from, to , weight);
         addEdge(toAdd);
+    }
+
+
+    public void addEdge(int idFrom, String t) {
+        addEdge(new Edge(idFrom,t));
+    }
+    public void addEdge(String from, int idTo) {
+        addEdge(new Edge(from,idTo));
+    }
+    public void addEdge(int from, String toS, Integer weight) {
+        addEdge(new Edge(new Node(from),new Node(toS),weight));
+    }
+
+    public void addEdge(String fromS, int to, Integer weight) {
+        addEdge(new Edge(new Node(fromS),new Node(to),weight));
+    }
+
+    public void addEdge(String fromS, String toS, Integer weight) {
+        addEdge(new Edge(new Node(fromS),new Node(toS),weight));
+    }
+
+    private void addEdge(String fromS, String toS) {
+        addEdge(new Edge(fromS,toS));
+    }
+
+    public void updateEdge(Node from, Node to, Integer weight) {
+        if(this.existsEdge(from, to)){
+            this.getEdge(from, to).setWeight(weight);
+        }else{
+            this.addEdge(new Edge(from,to,weight));
+        }
     }
 
     public List<Edge> getAllEdges()
@@ -682,9 +713,10 @@ public class Graf {
 
     public Edge getEdge(Node from, Node to )
     {
-        if(existsEdge(from, to ))
-        {
-            return adjEdList.get(from).get(adjEdList.get(from).indexOf(new Edge(from, to)));
+        for (Edge e :
+                adjEdList.get(from)) {
+            if (e.from.equals(from) && e.to.equals(to))
+                return e;
         }
         return null;
     }
@@ -1328,25 +1360,4 @@ public class Graf {
     }
 
 
-    public void addEdge(int idFrom, String t) {
-        addEdge(new Edge(idFrom,t));
-    }
-    public void addEdge(String from, int idTo) {
-        addEdge(new Edge(from,idTo));
-    }
-    public void addEdge(int from, String toS, Integer weight) {
-        addEdge(new Edge(new Node(from),new Node(toS),weight));
-    }
-
-    public void addEdge(String fromS, int to, Integer weight) {
-        addEdge(new Edge(new Node(fromS),new Node(to),weight));
-    }
-
-    public void addEdge(String fromS, String toS, Integer weight) {
-        addEdge(new Edge(new Node(fromS),new Node(toS),weight));
-    }
-
-    private void addEdge(String fromS, String toS) {
-        addEdge(new Edge(fromS,toS));
-    }
 }
