@@ -105,13 +105,13 @@ public class MaximalFlow {
         return result;
     }
 
-    public static Graf getMaxFlowGraf(Graf g){
+    public static Graf getMaxFlowGraf(Graf g, AP_ALGORITHM algorithm){
         Graf currentGraf = g.copy();
-        Pair<List<Edge>, Integer> p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,AP_ALGORITHM.DFS);
+        Pair<List<Edge>, Integer> p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,algorithm);
         do {
             System.out.println(graphAndPathDotString(currentGraf,p));
             currentGraf = grafToResidual(currentGraf,p);
-            p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,AP_ALGORITHM.DFS);
+            p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,algorithm);
         }while (p!=null);
         return currentGraf;
     }

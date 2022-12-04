@@ -1,3 +1,3 @@
 public enum AP_ALGORITHM {
-    DFS,
+    DFS, GREEDY, LOOKAHEAD1, LOOKAHEAD2
 }

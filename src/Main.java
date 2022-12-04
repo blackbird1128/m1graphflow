@@ -62,7 +62,7 @@ public class Main {
         Graf maxFlow;
         Graf g = gSubject;
         System.out.println(g);
-        maxFlow = MaximalFlow.getMaxFlowGraf(g);
+        maxFlow = MaximalFlow.getMaxFlowGraf(g,AP_ALGORITHM.LOOKAHEAD2);
         System.out.println(maxFlow);
     }
 
