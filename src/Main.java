@@ -56,13 +56,12 @@ public class Main {
 
         gSubject =Graf.fromDotFile("src/SubjectGraf");
     }
-    
+
     public static void main(String[] args)  {
         init();
         Graf maxFlow;
         Graf g = gSubject;
-        System.out.println(g);
-        maxFlow = MaximalFlow.getMaxFlowGraf(g,AP_ALGORITHM.LOOKAHEAD2);
+        maxFlow = MaximalFlow.getMaxFlowAndFiles(g, AP_ALGORITHM.DFS, "output");
         System.out.println(maxFlow);
     }
 

@@ -89,7 +89,7 @@ public class AugmentingPath {
                 }
             }
 
-            // If no path was found, return an empty path and 0 flow
+            // If no path was found, return an empty path
             return null;
         }
     }

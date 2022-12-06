@@ -2,17 +2,110 @@ import m1graph2022.Edge;
 import m1graph2022.Graf;
 import m1graph2022.Node;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class MaximalFlow {
+
+
+    static String graphToInitialDot(Graf g, int currStep)
+    {
+        StringBuilder repr = new StringBuilder();
+        repr.append("digraph g {\n");
+        repr.append("\trankdir=LR\n");
+        repr.append("\tlabel=\"(").append(currStep).append(") Flow initial . Value : 0\"\n");
+        ArrayList<Node> graphNodeList = new ArrayList<>(g.getAllNodes());
+        Collections.sort(graphNodeList);
+        for(Node n : graphNodeList) {
+            List<Edge> edges = g.getOutEdges(n);
+
+            if (edges != null) {
+                Collections.sort(edges);
+                for (Edge e : edges) {
+                    repr.append(String.format("\t%s -> %s", e.from(), e.to()));
+                    if (e.isWeighted()) {
+                        repr.append(String.format(" [label=%d, len=%d]", e.getWeight(), e.getWeight()));
+                    }
+                    repr.append("\n");
+                }
+
+            }
+            else
+            {
+                if(g.getIncidentEdges(n).size() == 0)
+                {
+                    repr.append("\t" +n + "\n");
+                }
+            }
+        }
+        repr.append("}");
+        return repr.toString();
+    }
+
+    /**
+     * Write the string representing the graph in the dot format into a file
+     * the filename is made of the param filename and the extension ".gv"
+     * @param filename the name of the file
+     */
+    public static void toDotFile(String filename, String content)
+    {
+        try
+        {
+            PrintWriter writer = new PrintWriter(filename + ".gv", "UTF-8");
+            writer.print(content);
+            writer.close();
+        }
+        catch(IOException e)
+        {
+            System.out.println("error writing to dot file");
+        }
+
+    }
+
+
+    /**
+     * Write the string representing the graph in the dot format into a file
+     * the filename is made of the param filename and the extension ".gv"
+     * @param destination the destination of the file
+     */
+    public static void toDotFile(File destination, String content)
+    {
+        try
+        {
+            PrintWriter writer = new PrintWriter(destination + ".gv", "UTF-8");
+            writer.print(content);
+            writer.close();
+        }
+        catch(IOException e)
+        {
+            System.out.println("error writing to dot file");
+        }
+
+    }
+
+
     //from graph and Pair<augmenting path, weight> to graph highlighted
-    static String graphAndPathDotString(Graf g, Pair<List<Edge>,Integer> pathPair){
+    static String graphAndPathDotString(Graf g, Pair<List<Edge>,Integer> pathPair, int currStep){
         List<Edge> edgeList = pathPair.first;
         StringBuilder repr = new StringBuilder();
         repr.append("digraph g {\n");
         repr.append("\trankdir=LR\n");
+        String label = "label=\"(" + currStep + ") residual graph.\n";
+        ArrayList<Node> augmentingPath = new ArrayList<>();
+        for(Edge e : pathPair.first)
+        {
+            augmentingPath.add(e.from());
+
+        }
+        augmentingPath.add(new Node("t"));
+        label += "Augmenting path: " + augmentingPath + ".\n";
+        label += "Residual capacity: " + pathPair.second + ".";
+        label += "\";\n";
+        repr.append(label);
         ArrayList<Node> graphNodeList = new ArrayList<>(g.getAllNodes());
         Collections.sort(graphNodeList);
         for(Node n : graphNodeList) {
@@ -31,7 +124,6 @@ public class MaximalFlow {
                     }
                     repr.append("\n");
                 }
-
             }
             else
             {
@@ -45,12 +137,15 @@ public class MaximalFlow {
         return repr.toString();
     }
 
-    static String flowDotString(Graf g, Pair<List<Edge>,Integer> pathPair){
+    static String flowDotString(Graf g, Pair<List<Edge>,Integer> pathPair, int currStep){
         List<Edge> edgeList = pathPair.first;
         int minFlow = pathPair.second;
         StringBuilder repr = new StringBuilder();
         repr.append("digraph g {\n");
         repr.append("\trankdir=LR\n");
+        String label = "label=\"(" + currStep + ") Flow induced from residual graph " + Math.min(currStep - 1, 1) + ".";
+        label += " Value: 3\";\n";
+        repr.append(label);
         ArrayList<Node> graphNodeList = new ArrayList<>(g.getAllNodes());
         Collections.sort(graphNodeList);
         for(Node n : graphNodeList) {
@@ -109,11 +204,46 @@ public class MaximalFlow {
         Graf currentGraf = g.copy();
         Pair<List<Edge>, Integer> p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,algorithm);
         do {
-            System.out.println(graphAndPathDotString(currentGraf,p));
+            System.out.println(graphAndPathDotString(currentGraf,p, 0));
             currentGraf = grafToResidual(currentGraf,p);
             p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,algorithm);
+            System.out.println(p);
         }while (p!=null);
         return currentGraf;
+    }
+
+    public static Graf getMaxFlowAndFiles(Graf g, AP_ALGORITHM algorithm, String outputDirectory)
+    {
+
+        File output = new File(outputDirectory);
+        if(!output.isDirectory())
+        {
+            System.out.println("Error: the path you provided is not a directory or doesn't exist");
+            return null;
+        }
+        int currStep = 1;
+        String curFile = "flow";
+
+        Graf currentGraf = g.copy();
+        String curRepr = graphToInitialDot(currentGraf, currStep);
+        toDotFile(output + "/" + curFile + currStep, curRepr);
+        Pair<List<Edge>, Integer> p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,algorithm);
+        while(p!=null){
+            curRepr = graphAndPathDotString(currentGraf,p, currStep); // residual
+            System.out.println(curRepr);
+            curFile = "residGraph";
+            toDotFile(output + "/" + curFile + currStep, curRepr);
+            curRepr = flowDotString(g, p, currStep);
+            curFile = "flow";
+            toDotFile(output + "/" + curFile + currStep , curRepr);
+            currentGraf = grafToResidual(currentGraf,p);
+            p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,algorithm);
+            currStep++;
+        }
+        return currentGraf;
+
+
+
     }
 
 }
