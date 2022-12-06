@@ -1,6 +1,7 @@
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import m1graph2022.*;
@@ -59,11 +60,10 @@ public class Main {
     
     public static void main(String[] args)  {
         init();
-        Graf maxFlow;
+
         Graf g = gSubject;
         System.out.println(g);
-        maxFlow = MaximalFlow.getMaxFlowGraf(g,AP_ALGORITHM.LOOKAHEAD2);
-        System.out.println(maxFlow);
+        MaximalFlow.getMaxFlowGraf(g,AP_ALGORITHM.GREEDY);
     }
 
 }

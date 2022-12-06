@@ -13,6 +13,24 @@ public class AugmentingPath {
             System.out.println( AugmentingPath.getAugmentingPath(g.getNode(1), g.getNode(5), g,  AP_ALGORITHM.DFS));
     }
 
+    public static boolean canJoin(Node from, Node to, Graf g, Set<Node> visited){
+        boolean canJoin = false;
+        if(from.equals(to)){
+            return true;
+        }
+        for (Edge e :
+                g.getOutEdges(from)) {
+            if (!visited.contains(e.to())) {
+                visited.add(e.to());
+                canJoin = canJoin(e.to(),to,g,visited);
+                visited.remove(e.to());
+            }
+            if (canJoin){
+                return true;
+            }
+        }
+        return false;
+    }
 
     public static Pair<List<Edge>,Integer> getAugmentingPath(Node start, Node end, Graf g, AP_ALGORITHM algorithm )
     {
@@ -99,78 +117,70 @@ public class AugmentingPath {
         return getAugmentingPathLookAheadRec(start,end,g,lookahead, visited, currentPath);
     }
 
-    private static Pair<List<Edge>,Integer> getAugmentingPathLookAheadRec(Node start, Node end, Graf g, int lookahead, Set<Node> visited, Pair<List<Edge>,Integer> currentPath){
-        if (!visited.contains(start)){
-            visited.add(start);
-        }
+    private static Pair<List<Edge>, Integer> getAugmentingPathLookAheadRec(Node start, Node end, Graf g, int lookahead, Set<Node> visited, Pair<List<Edge>, Integer> currentPath) {
         if(start.equals(end)){
             return currentPath;
         }
-        List<Pair<List<Edge>,Integer>> listOfCurrentPartialPaths = allPartialPaths(start,end,g, lookahead, visited);
-        if(listOfCurrentPartialPaths.size()==0){
-            int last = currentPath.first.size()-1;
-            Node from = currentPath.first.get(last).from();
-            currentPath.first.remove(last);
-            int max = 0;
-            for (Edge e : currentPath.first) {
-                max = Math.max(e.getWeight(),max);
-            }
-            currentPath.second = max;
-            return getAugmentingPathLookAhead(from,end,g,lookahead);
+        if(!canJoin(start,end,g,visited)){
+            return null;
         }
-
-
-        Pair<List<Edge>, Integer> tokeep = new Pair<>(new ArrayList<>(), 0 );
-        for (Pair<List<Edge>, Integer> pair : listOfCurrentPartialPaths) {
-            if(tokeep.second.compareTo(pair.second)<0){
-                tokeep = pair;
+        visited.add(start);
+        List<Pair<List<Edge>,Integer>> potentialPaths = potentialPaths(start,end,g,visited,lookahead+1);
+        visited.remove(start);
+        Pair<List<Edge>,Integer> currentBestOption=null;
+        for (Pair<List<Edge>, Integer> p:
+                potentialPaths){
+            if(currentBestOption == null){
+                currentBestOption = p;
+                continue;
+            }
+            if(p.second.compareTo(currentBestOption.second)>0){
+                currentBestOption = p;
+                currentBestOption.second = p.second;
             }
         }
-        currentPath.first.addAll(tokeep.first);
-        currentPath.second = Math.min(currentPath.second, tokeep.second);
+        if(currentBestOption ==null || currentBestOption.second == 0)
+            return null;
+
+        currentPath.first.addAll(currentBestOption.first);
+        currentPath.second = Math.min(currentPath.second, currentBestOption.second);
+        Node last = currentPath.first.get(currentPath.first.size()-1).to();
         for (Edge e :
-                tokeep.first) {
-            visited.add(e.from());
-        }
-        return getAugmentingPathLookAheadRec(
-                tokeep.first.get(tokeep.first.size()-1).to(),
-                end,
-                g,
-                lookahead,
-                visited,
-                currentPath
-                );
+                currentBestOption.first) {
+            visited.add(e.to());
+        };
+        return getAugmentingPathLookAheadRec(last,end, g,lookahead,visited,currentPath);
     }
 
-    private static List<Pair<List<Edge>, Integer>> allPartialPaths(Node start, Node end, Graf g, int lookahead, Set<Node> visited) {
-        ArrayList<Pair<List<Edge>,Integer>> partialPaths = new ArrayList();
-        if (lookahead == 0 || start.equals(end)){
-            for (Edge e : g.getOutEdges(start)) {
-                if (!visited.contains(e.to())){
-                    Pair<List<Edge>,Integer> p = new Pair<>(new ArrayList<>(),e.getWeight());
-                    p.first.add(e);
-                    partialPaths.add(p);
-                }
-            }
-        }else{
-
+    private static List<Pair<List<Edge>, Integer>> potentialPaths(Node start, Node end, Graf g, Set<Node> visited, int distance) {
+        List<Pair<List<Edge>, Integer>> paths = new ArrayList<>();
+        if(distance==0 || start.equals(end)){
             for (Edge e :
                     g.getOutEdges(start)) {
-                if (!visited.contains(e.to())){
-                    visited.add(e.to());
-                    List<Pair<List<Edge>,Integer>> cpp = allPartialPaths(e.to(),end,g,lookahead-1,visited); //cpp = Current Partial Paths
-                    visited.remove(e.to());
-                    for (Pair<List<Edge>,Integer> pair : cpp) {
-                        List<Edge> path = new ArrayList<>();
-                        path.add(e);
-                        path.addAll(pair.first);
-                        Integer min = e.getWeight().compareTo(pair.second) < 0 ? e.getWeight(): pair.second;
-                        partialPaths.add(new Pair<>(path,min));
-                    }
-                }
+                Pair<List<Edge>, Integer> p = new Pair<>(new ArrayList<>(),e.getWeight());
+                p.first.add(e);
+                paths.add(p);
             }
+            return paths;
         }
-        
-        return partialPaths;
+        for (Edge e :
+                g.getOutEdges(start)) {
+            visited.add(e.to());
+            if(!canJoin(e.to(),end,g,visited)) continue;
+            for (Pair<List<Edge>,Integer> p : potentialPaths(e.to(),end,g,visited,distance-1)){
+                Pair<List<Edge>,Integer> currentPath = new Pair<>(new ArrayList<>(),0);
+                currentPath.first.add(e);
+                currentPath.second = e.getWeight();
+                if(p.second.compareTo(currentPath.second)<0){
+                    currentPath.second = p.second;
+                }
+                currentPath.first.addAll(p.first);
+                paths.add(currentPath);
+            }
+            visited.remove(e.to());
+        }
+        return paths;
     }
+
+
 }

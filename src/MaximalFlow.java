@@ -108,12 +108,15 @@ public class MaximalFlow {
     public static Graf getMaxFlowGraf(Graf g, AP_ALGORITHM algorithm){
         Graf currentGraf = g.copy();
         Pair<List<Edge>, Integer> p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,algorithm);
-        do {
-            System.out.println(graphAndPathDotString(currentGraf,p));
-            currentGraf = grafToResidual(currentGraf,p);
-            p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,algorithm);
-        }while (p!=null);
-        return currentGraf;
+        if(p!=null){
+            do {
+                System.out.println(graphAndPathDotString(currentGraf,p));
+                currentGraf = grafToResidual(currentGraf,p);
+                p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,algorithm);
+            }while (p!=null);
+            return currentGraf;
+        }
+        return g;
     }
 
 }
