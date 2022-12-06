@@ -63,7 +63,7 @@ public class Main {
 
         Graf g = gSubject;
         System.out.println(g);
-        MaximalFlow.getMaxFlowGraf(g,AP_ALGORITHM.GREEDY);
+        MaximalFlow.getMaxFlowGraf(g,AP_ALGORITHM.LOOKAHEAD1);
     }
 
 }
