@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class MaximalFlow {
 
@@ -89,21 +90,32 @@ public class MaximalFlow {
 
 
     //from graph and Pair<augmenting path, weight> to graph highlighted
-    static String graphAndPathDotString(Graf g, Pair<List<Edge>,Integer> pathPair, int currStep){
-        List<Edge> edgeList = pathPair.first;
+    static String graphAndPathDotString(Graf g, Pair<List<Edge>,Integer> pathPair, int currStep) {
+        ArrayList<Node> augmentingPath = new ArrayList<>();
+        List<Edge> edgeList = new ArrayList<>();
+        if (pathPair != null) {
+            edgeList = pathPair.first;
+            for (Edge e : pathPair.first) {
+                augmentingPath.add(e.from());
+
+            }
+            augmentingPath.add(new Node("t"));
+        }
         StringBuilder repr = new StringBuilder();
         repr.append("digraph g {\n");
         repr.append("\trankdir=LR\n");
         String label = "label=\"(" + currStep + ") residual graph.\n";
-        ArrayList<Node> augmentingPath = new ArrayList<>();
-        for(Edge e : pathPair.first)
+        if(augmentingPath.size() > 0)
         {
-            augmentingPath.add(e.from());
+            label += "Augmenting path: " + augmentingPath + ".\n";
+            label += "Residual capacity: " + pathPair.second + ".";
 
         }
-        augmentingPath.add(new Node("t"));
-        label += "Augmenting path: " + augmentingPath + ".\n";
-        label += "Residual capacity: " + pathPair.second + ".";
+        else
+        {
+            label += "Augmenting path: none.\n";
+            label += "Previous flow was maximum";
+        }
         label += "\";\n";
         repr.append(label);
         ArrayList<Node> graphNodeList = new ArrayList<>(g.getAllNodes());
@@ -117,6 +129,10 @@ public class MaximalFlow {
                     repr.append(String.format("\t%s -> %s", e.from(), e.to()));
                     if (e.isWeighted()) {
                         repr.append(String.format(" [label=%d, len=%d", e.getWeight(), e.getWeight()));
+                        if(pathPair != null && Objects.equals(pathPair.second, e.getWeight()) && edgeList.contains(e))
+                        {
+                            repr.append(", fontcolor=\"red\" ");
+                        }
                         if(edgeList.contains(e)){
                             repr.append(", penwidth=3, color=\"blue\"");
                         }
@@ -137,14 +153,14 @@ public class MaximalFlow {
         return repr.toString();
     }
 
-    static String flowDotString(Graf g, Pair<List<Edge>,Integer> pathPair, int currStep){
-        List<Edge> edgeList = pathPair.first;
-        int minFlow = pathPair.second;
+    static String flowDotString(Graf g, Pair<List<Edge>,Integer> pathPair, int currStep, int maxFlow){
+        List<Edge> edgeList = pathPair != null ? pathPair.first : new ArrayList<>() ;
+        int minFlow = pathPair != null ? pathPair.second : -1;
         StringBuilder repr = new StringBuilder();
         repr.append("digraph g {\n");
         repr.append("\trankdir=LR\n");
-        String label = "label=\"(" + currStep + ") Flow induced from residual graph " + Math.min(currStep - 1, 1) + ".";
-        label += " Value: 3\";\n";
+        String label = "label=\"(" + currStep + ") Flow induced from residual graph " + Math.max(currStep - 1, 1) + ".";
+        label += " Value: " + maxFlow +"\";\n";
         repr.append(label);
         ArrayList<Node> graphNodeList = new ArrayList<>(g.getAllNodes());
         Collections.sort(graphNodeList);
@@ -227,19 +243,38 @@ public class MaximalFlow {
         Graf currentGraf = g.copy();
         String curRepr = graphToInitialDot(currentGraf, currStep);
         toDotFile(output + "/" + curFile + currStep, curRepr);
+        System.out.println("treated: " + currentGraf.toDotString());
+        int maxFlow = 0;
         Pair<List<Edge>, Integer> p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,algorithm);
-        while(p!=null){
+        do{
+            maxFlow += p.second;
             curRepr = graphAndPathDotString(currentGraf,p, currStep); // residual
             System.out.println(curRepr);
             curFile = "residGraph";
             toDotFile(output + "/" + curFile + currStep, curRepr);
-            curRepr = flowDotString(g, p, currStep);
+            curRepr = flowDotString(g, p, currStep, maxFlow);
             curFile = "flow";
-            toDotFile(output + "/" + curFile + currStep , curRepr);
+            if(currStep != 1) // avoid replacing the init dot file
+            {
+                toDotFile(output + "/" + curFile + currStep , curRepr);
+            }
             currentGraf = grafToResidual(currentGraf,p);
+            System.out.println("treated: " + currentGraf.toDotString());
             p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,algorithm);
             currStep++;
-        }
+        }while(p!= null);
+
+        curRepr = graphAndPathDotString(currentGraf,p, currStep); // residual
+        System.out.println(curRepr);
+        curFile = "residGraph";
+        toDotFile(output + "/" + curFile + currStep, curRepr);
+        //curRepr = flowDotString(g, p, currStep, maxFlow);
+        //curFile = "flow";
+
+        //toDotFile(output + "/" + curFile + currStep , curRepr);
+
+
+
         return currentGraf;
 
 

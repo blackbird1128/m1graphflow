@@ -26,10 +26,13 @@ public class AugmentingPath {
                 return getAugmentingPathLookAhead(start,end,g,1);
             case LOOKAHEAD2:
                 return getAugmentingPathLookAhead(start,end,g,2);
+            case DIJKSTRA:
+                return getAugmentingPathDijkstra(start, end , g);
                 default:
                 return null;
         }
     }
+
 
     public static Pair<List<Edge>,Integer> getAugmentingPath(int idStart, int idEnd, Graf g , AP_ALGORITHM algorithm)
     {
@@ -37,6 +40,88 @@ public class AugmentingPath {
         Node end = new Node(idEnd);
         return getAugmentingPath(start, end, g, algorithm);
     }
+
+    static class CapacityComparator implements Comparator<Node> {
+
+        HashMap<Node, Integer> fatness;
+
+
+        public CapacityComparator(Map<Node, Integer> fatness_){
+            fatness = (HashMap<Node, Integer>) fatness_;
+        }
+
+        @Override
+        public int compare(Node x, Node y) {
+
+            // reversed order cause priority take the least element first
+            return fatness.get(y).compareTo(fatness.get(x));
+        }
+    }
+
+    public static Pair<List<Edge>, Integer> getAugmentingPathDijkstra(Node start,Node end , Graf g)
+    {
+        HashMap<Node, Integer> fatness = new HashMap<>();
+        for(Node n: g.getAllNodes())
+        {
+            fatness.put(n, 0);
+        }
+        fatness.put(start, Integer.MAX_VALUE);
+        HashMap<Node, Node> predecessors = new HashMap<>();
+
+        Comparator<Node> capacityComparator = new CapacityComparator(fatness);
+        PriorityQueue<Node> q = new PriorityQueue<>(capacityComparator);
+        q.addAll(g.getAllNodes());
+        while(!q.isEmpty())
+        {
+            Node u = q.poll();
+            for(Edge vE : g.getOutEdges(u))
+            {
+                Node v = vE.to();
+                if( fatness.get(v) < Math.max(fatness.get(u), vE.getWeight())) // check the capacity
+                {
+                    fatness.put(v,Math.max(fatness.get(u), vE.getWeight()));
+                    predecessors.put(v, u);
+                }
+
+            }
+        }
+
+        List<Edge> path = new ArrayList<>();
+        Node currNode = predecessors.get(end); // On fait à l'envers comme on a que les prédecesseur
+        int minCapacity = Integer.MAX_VALUE;
+        while(currNode != start && currNode != null)
+        {
+            List<Edge> edges = g.getEdges(predecessors.get(currNode),currNode);
+            Edge maxEdge = Collections.max(edges);
+            int maxEdgeCapacity = maxEdge.getWeight();
+            if(maxEdgeCapacity <= minCapacity)
+            {
+                minCapacity = maxEdgeCapacity;
+            }
+            path.add(maxEdge);
+            currNode = predecessors.get(currNode);
+        }
+
+        if(path.size() == 0) // On a rien trouvé, y'a pas de chemin
+        {
+            return null;
+        }
+
+        Collections.reverse(path);
+
+        Edge maxEdge = Collections.max(g.getEdges(predecessors.get(end),end));
+        if(maxEdge.getWeight() < minCapacity)
+        {
+            minCapacity = maxEdge.getWeight();
+        }
+        path.add(maxEdge);
+
+
+        return new Pair<>(path, minCapacity);
+
+
+    }
+
 
     //////////
     ////////// DFS algorithm to compute the augmenting path
