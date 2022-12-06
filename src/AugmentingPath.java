@@ -41,34 +41,57 @@ public class AugmentingPath {
     //////////
     ////////// DFS algorithm to compute the augmenting path
     //////////
-
-    private static Pair<List<Edge>,Integer> getPathToRecDFS(Node start, Node end, Graf g, List<Edge> currentPath, Set<Node> visited, int currentFlow)
+    private static Pair<List<Edge>, Integer> getPathToRecDFS(Node start, Node end, Graf g, List<Edge> currentPath, Set<Node> visited, int currentFlow)
     {
-        if(start.equals(end))
+        if (start.equals(end))
         {
-            return new Pair<List<Edge>,Integer>(currentPath,currentFlow);
+            // Return the current path and flow
+            return new Pair<List<Edge>, Integer>(currentPath, currentFlow);
         }
         else
         {
+            // Mark the current node as visited
             visited.add(start);
-            for(Node n : g.getSuccessors(start))
-            {
-                if(!visited.contains(n))
-                {
-                    ArrayList<Edge> extendedPath =  new ArrayList<>(currentPath); // copy cause reference are fucking weird
-                    List<Edge> le = g.getEdges(start,n);
-                    Edge e = Collections.max(le); // we take the greatest augmenting path
-                    extendedPath.add(e);
-                    if(e.getWeight() < currentFlow){
-                        currentFlow = e.getWeight();
-                    }
-                    return getPathToRecDFS(n, end, g , extendedPath,visited, currentFlow);
-                }
 
+            // Create a priority queue for the edges
+            PriorityQueue<Edge> edges = new PriorityQueue<>(g.getOutEdges(start));
+
+            // Search for augmenting paths
+            while (!edges.isEmpty())
+            {
+                // Take the edge with the greatest weight
+                Edge e = edges.poll();
+
+                // Get the next node
+                Node n = e.to();
+
+                // If the next node has not been visited
+                if (!visited.contains(n))
+                {
+                    // Copy the current path and visited array
+                    List<Edge> extendedPath = new ArrayList<>(currentPath);
+                    Set<Node> visitedC = new HashSet<>(visited);
+
+                    // Add the current edge to the path
+                    extendedPath.add(e);
+
+                    // Update the flow with the weight of the edge
+                    int newFlow = Math.min(currentFlow, e.getWeight());
+
+                    // Recursively search for paths from the next node
+                    Pair<List<Edge>, Integer> path = getPathToRecDFS(n, end, g, extendedPath, visitedC, newFlow);
+
+                    // If a path was found, return it
+                    if (path != null)
+                    {
+                        return path;
+                    }
+                }
             }
+
+            // If no path was found, return an empty path and 0 flow
             return null;
         }
-
     }
 
     private static Pair<List<Edge>,Integer> getAugmentingPathDFS(Node start, Node end , Graf g)
@@ -82,6 +105,7 @@ public class AugmentingPath {
         {
             HashSet<Node> visited = new HashSet<>();
             ArrayList<Edge> currentPath = new ArrayList<>();
+            System.out.println("Visited graph : " + g.toDotString());
             return getPathToRecDFS(start, end, g,currentPath,visited, Integer.MAX_VALUE);
         }
 
