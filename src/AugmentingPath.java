@@ -18,6 +18,7 @@ public class AugmentingPath {
         if(from.equals(to)){
             return true;
         }
+        visited.add(from);
         for (Edge e :
                 g.getOutEdges(from)) {
             if (!visited.contains(e.to())) {
@@ -29,7 +30,18 @@ public class AugmentingPath {
                 return true;
             }
         }
+        visited.remove(from);
         return false;
+    }
+
+    static boolean blocksTheWay(Node end, List<Edge> path, Graf g, Set<Node> alreadyVisited){
+        Set<Node> visited = new HashSet<>(alreadyVisited);
+        visited.add(path.get(0).from());
+        for (Edge e :
+                path) {
+            visited.add(e.to());
+        }
+        return !canJoin(path.get(path.size()-1).to(),end,g,visited);
     }
 
     public static Pair<List<Edge>,Integer> getAugmentingPath(Node start, Node end, Graf g, AP_ALGORITHM algorithm )
@@ -234,60 +246,72 @@ public class AugmentingPath {
             return null;
         }
         visited.add(start);
-        List<Pair<List<Edge>,Integer>> potentialPaths = potentialPaths(start,end,g,visited,lookahead+1);
-        visited.remove(start);
+        List<Pair<List<Edge>,Integer>> potentialPaths = potentialPaths(start,end,g,new HashSet<>(visited),lookahead);
         Pair<List<Edge>,Integer> currentBestOption=null;
         for (Pair<List<Edge>, Integer> p:
                 potentialPaths){
-            if(currentBestOption == null){
-                currentBestOption = p;
-                continue;
-            }
-            if(p.second.compareTo(currentBestOption.second)>0){
-                currentBestOption = p;
-                currentBestOption.second = p.second;
+            if (!blocksTheWay(end,p.first,g,visited)){
+                if(currentBestOption == null){
+                    currentBestOption = p;
+                    continue;
+                }
+                if(p.second.compareTo(currentBestOption.second)>0){
+                    currentBestOption = p;
+                    currentBestOption.second = p.second;
+                }
             }
         }
-        if(currentBestOption ==null || currentBestOption.second == 0)
+        if(currentBestOption == null || currentBestOption.second == 0)
             return null;
 
         currentPath.first.addAll(currentBestOption.first);
         currentPath.second = Math.min(currentPath.second, currentBestOption.second);
         Node last = currentPath.first.get(currentPath.first.size()-1).to();
         for (Edge e :
-                currentBestOption.first) {
+                currentPath.first) {
             visited.add(e.to());
         };
         return getAugmentingPathLookAheadRec(last,end, g,lookahead,visited,currentPath);
     }
 
     private static List<Pair<List<Edge>, Integer>> potentialPaths(Node start, Node end, Graf g, Set<Node> visited, int distance) {
+        visited.add(start);
         List<Pair<List<Edge>, Integer>> paths = new ArrayList<>();
-        if(distance==0 || start.equals(end)){
+        if(start.equals(end)){
+            List<Pair<List<Edge>, Integer>> ret = new ArrayList<>();
+            ret.add(new Pair<>(new ArrayList<>(),Integer.MAX_VALUE));
+            visited.remove(start);
+            return ret;
+        }
+        if(distance==0){
             for (Edge e :
                     g.getOutEdges(start)) {
-                Pair<List<Edge>, Integer> p = new Pair<>(new ArrayList<>(),e.getWeight());
-                p.first.add(e);
-                paths.add(p);
+                if(!visited.contains(e.to())) {
+                    Pair<List<Edge>, Integer> p = new Pair<>(new ArrayList<>(), e.getWeight());
+                    p.first.add(e);
+                    paths.add(p);
+                }
             }
+            visited.remove(start);
             return paths;
         }
         for (Edge e :
                 g.getOutEdges(start)) {
-            visited.add(e.to());
             if(!canJoin(e.to(),end,g,visited)) continue;
             for (Pair<List<Edge>,Integer> p : potentialPaths(e.to(),end,g,visited,distance-1)){
-                Pair<List<Edge>,Integer> currentPath = new Pair<>(new ArrayList<>(),0);
-                currentPath.first.add(e);
-                currentPath.second = e.getWeight();
-                if(p.second.compareTo(currentPath.second)<0){
-                    currentPath.second = p.second;
+                if(!visited.contains(e.to())) {
+                    Pair<List<Edge>, Integer> currentPath = new Pair<>(new ArrayList<>(), 0);
+                    currentPath.first.add(e);
+                    currentPath.second = e.getWeight();
+                    if (p.second.compareTo(currentPath.second) < 0) {
+                        currentPath.second = p.second;
+                    }
+                    currentPath.first.addAll(p.first);
+                    paths.add(currentPath);
                 }
-                currentPath.first.addAll(p.first);
-                paths.add(currentPath);
             }
-            visited.remove(e.to());
         }
+        visited.remove(start);
         return paths;
     }
 
