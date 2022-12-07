@@ -737,7 +737,7 @@ public class Graf {
         ArrayList<Edge> outEdges = new ArrayList<>();
         if(adjEdList.containsKey(n))
         {
-            outEdges = (ArrayList<Edge>) adjEdList.get(n);
+            outEdges = new ArrayList<>(adjEdList.get(n));
         }
         return outEdges;
     }

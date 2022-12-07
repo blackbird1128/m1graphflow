@@ -4,5 +4,4 @@ digraph demoNetwork {
     s -> 2 [ label ="7" , len =7];
     1 -> t [ label="10" , len=10];
     2 -> t [ label="2" , len=2];
-
 }

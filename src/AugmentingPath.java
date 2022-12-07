@@ -83,6 +83,10 @@ public class AugmentingPath {
         @Override
         public int compare(Node x, Node y) {
             // reversed order cause priority take the least element first
+            if(x.getId()==4) {
+                System.out.println("" + y + " : " + fatness.get(y));
+                System.out.println("" + x + " : " + fatness.get(x));
+            }
             return fatness.get(y).compareTo(fatness.get(x));
         }
     }

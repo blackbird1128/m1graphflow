@@ -262,7 +262,6 @@ public class MaximalFlow {
             System.out.println("treated: " + currentGraf.toDotString());
             p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,algorithm);
             currStep++;
-            System.out.println("p");
         }while(p!= null);
 
         curRepr = graphAndPathDotString(currentGraf,p, currStep); // residual

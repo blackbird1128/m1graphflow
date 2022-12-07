@@ -50,7 +50,15 @@ public class Node implements Comparable<Node> {
         }
         if (o == null || getClass() != o.getClass()) return false;
         Node node = (Node) o;
-        return (name != null && node.name != null && name.equals(node.name)) || id == node.id;
+        if (name != null && node.name != null ){
+            return  name.equals(node.name);
+        }else{
+            if(name != null || node.name!=null){
+                return false;
+            }else{
+                return id == node.id;
+            }
+        }
     }
 
     @Override
