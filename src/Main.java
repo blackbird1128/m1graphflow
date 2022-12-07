@@ -54,7 +54,7 @@ public class Main {
         g2.addEdge(n1,n2,3);
         g2.addEdge(n2,t,2);
 
-        gSubject =Graf.fromDotFile("src/SubjectGraf");
+        gSubject =Graf.fromDotFile("dots/demo");
     }
     
     public static void main(String[] args)  {
@@ -62,7 +62,7 @@ public class Main {
         Graf maxFlow;
         Graf g = gSubject;
         System.out.println(g);
-        maxFlow = MaximalFlow.getMaxFlowGraf(g,AP_ALGORITHM.LOOKAHEAD2);
+        maxFlow = MaximalFlow.getMaxFlowAndFiles(g,AP_ALGORITHM.DIJKSTRA, "output");
         System.out.println(maxFlow);
     }
 

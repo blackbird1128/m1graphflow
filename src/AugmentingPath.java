@@ -70,7 +70,6 @@ public class AugmentingPath {
 
         @Override
         public int compare(Node x, Node y) {
-
             // reversed order cause priority take the least element first
             return fatness.get(y).compareTo(fatness.get(x));
         }
@@ -95,12 +94,11 @@ public class AugmentingPath {
             for(Edge vE : g.getOutEdges(u))
             {
                 Node v = vE.to();
-                if( fatness.get(v) < Math.max(fatness.get(u), vE.getWeight())) // check the capacity
+                if( fatness.get(v) < Math.min(fatness.get(u), vE.getWeight())) // check the capacity
                 {
-                    fatness.put(v,Math.max(fatness.get(u), vE.getWeight()));
+                    fatness.put(v,Math.min(fatness.get(u), vE.getWeight()));
                     predecessors.put(v, u);
                 }
-
             }
         }
 
@@ -112,7 +110,7 @@ public class AugmentingPath {
             List<Edge> edges = g.getEdges(predecessors.get(currNode),currNode);
             Edge maxEdge = Collections.max(edges);
             int maxEdgeCapacity = maxEdge.getWeight();
-            if(maxEdgeCapacity <= minCapacity)
+            if(maxEdgeCapacity < minCapacity)
             {
                 minCapacity = maxEdgeCapacity;
             }

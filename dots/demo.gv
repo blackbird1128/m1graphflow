@@ -1,0 +1,13 @@
+digraph demoNetwork {
+    rankdir =" LR ";
+    s -> 1 [ label ="16" , len =16];
+    s -> 2 [ label ="13" , len =13];
+    1 -> 2 [ label ="10" , len =10];
+    1 -> 3 [ label="12" , len= 12];
+    2 -> 1 [ label ="4" , len =4];
+    2 -> 4 [ label ="14" , len =14];
+    3 -> 2 [ label ="9" , len =9];
+    3 -> t [ label ="20" , len =20];
+    4 -> t [ label ="4" , len =4];
+    4 -> 3 [ label ="7" , len=7];
+}

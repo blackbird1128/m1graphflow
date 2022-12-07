@@ -262,16 +262,17 @@ public class MaximalFlow {
             System.out.println("treated: " + currentGraf.toDotString());
             p = AugmentingPath.getAugmentingPath(g.getNode("s"),g.getNode("t"),currentGraf,algorithm);
             currStep++;
+            System.out.println("p");
         }while(p!= null);
 
         curRepr = graphAndPathDotString(currentGraf,p, currStep); // residual
         System.out.println(curRepr);
         curFile = "residGraph";
         toDotFile(output + "/" + curFile + currStep, curRepr);
-        //curRepr = flowDotString(g, p, currStep, maxFlow);
-        //curFile = "flow";
+        curRepr = flowDotString(g, p, currStep, maxFlow);
+        curFile = "flow";
 
-        //toDotFile(output + "/" + curFile + currStep , curRepr);
+        toDotFile(output + "/" + curFile + currStep , curRepr);
 
 
 
