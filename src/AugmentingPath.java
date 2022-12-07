@@ -71,13 +71,17 @@ public class AugmentingPath {
         return getAugmentingPath(start, end, g, algorithm);
     }
 
-    static class CapacityComparator implements Comparator<Node> {
+   static class CapacityComparator implements Comparator<Node> {
 
-        HashMap<Node, Integer> fatness;
+        public HashMap<Node, Integer> fatness_;
 
+        public CapacityComparator(HashMap<Node, Integer> fatness_){
+            this.fatness_ =  fatness_;
+        }
 
-        public CapacityComparator(Map<Node, Integer> fatness_){
-            fatness = (HashMap<Node, Integer>) fatness_;
+        public void setFatnessMap(HashMap<Node, Integer> f)
+        {
+            fatness_ = f;
         }
 
         @Override
@@ -87,13 +91,15 @@ public class AugmentingPath {
                 System.out.println("" + y + " : " + fatness.get(y));
                 System.out.println("" + x + " : " + fatness.get(x));
             }
-            return fatness.get(y).compareTo(fatness.get(x));
+            return fatness_.get(y).compareTo(fatness_.get(x));
         }
     }
+    static HashMap<Node, Integer> fatness = new HashMap<>();
+
 
     public static Pair<List<Edge>, Integer> getAugmentingPathDijkstra(Node start,Node end , Graf g)
     {
-        HashMap<Node, Integer> fatness = new HashMap<>();
+
         for(Node n: g.getAllNodes())
         {
             fatness.put(n, 0);
@@ -112,7 +118,7 @@ public class AugmentingPath {
                 Node v = vE.to();
                 if( fatness.get(v) < Math.min(fatness.get(u), vE.getWeight())) // check the capacity
                 {
-                    fatness.put(v,Math.min(fatness.get(u), vE.getWeight()));
+                    fatness.put(v, Math.min(fatness.get(u), vE.getWeight()));
                     predecessors.put(v, u);
                 }
             }
